@@ -36,6 +36,6 @@ export const fetchWorkerById = async (id: string) => {
     throw new Error(`Failed to fetch worker: ${res.status} ${errorText}`);
   }
   const result = await res.json();
-  console.log("🔎 Worker by ID response:", result);
+  console.log("Worker by ID response:", result);
   return result.data ?? result; 
 };

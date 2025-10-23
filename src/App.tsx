@@ -5,6 +5,7 @@ import WorkerProfile from "./pages/WorkerProfile";
 import AdminLayout from "./layouts/AdminLayout";
 import Settings from "./pages/Settings";
 import Customers from "./pages/Customers";
+import BasePrice from "./pages/BasePrice";
 import "./index.css";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
           <Route path="workers/:id" element={<WorkerProfile />} />
           <Route path="customers" element={<Customers />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="base-price" element={<BasePrice />} /> 
 
         </Route>
 

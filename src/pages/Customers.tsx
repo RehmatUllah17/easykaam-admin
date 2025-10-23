@@ -17,7 +17,7 @@ const Customers = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // 🔍 Search states
+  // Search states
   const [searchId, setSearchId] = useState("");
   const [searchResults, setSearchResults] = useState<Customer[] | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -42,7 +42,7 @@ const Customers = () => {
     loadCustomers();
   }, [pageNumber, searchResults]);
 
-  // 🔍 Search handler
+  // Search handler
   const handleSearch = async () => {
     if (!searchId.trim()) {
       setSearchResults(null);
@@ -73,7 +73,7 @@ const Customers = () => {
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-4">Customers</h1>
 
-      {/* 🔍 Search box */}
+      {/* Search box */}
       <div className="flex items-center gap-2 mb-6">
         <input
           type="text"
@@ -101,7 +101,7 @@ const Customers = () => {
         )}
       </div>
 
-      {/* 🔎 Search Results */}
+      {/* Search Results */}
       {searchLoading ? (
         <p>Searching...</p>
       ) : searchResults ? (
@@ -116,7 +116,7 @@ const Customers = () => {
         )
       ) : null}
 
-      {/* 📋 Customer List (only when no search active) */}
+      {/* Customer List (only when no search active) */}
       {!searchResults && (
         <>
           {loading ? (

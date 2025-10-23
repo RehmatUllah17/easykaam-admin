@@ -40,7 +40,7 @@ export const fetchCustomerById = async (id: string) => {
   }
 
   const result = await res.json();
-  console.log("🔎 Customer by ID response:", result);
+  console.log("Customer by ID response:", result);
   return result.data ?? result;
 };
 
@@ -62,7 +62,7 @@ export const searchCustomerById = async (id: string) => {
   }
 
   const result = await res.json();
-  console.log("🔍 Search API response:", result);
+  console.log("Search API response:", result);
   return Array.isArray(result) ? result : [];
 };
 
