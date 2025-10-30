@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -18,11 +18,51 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
 const BasePrice: React.FC = () => {
   const [prices, setPrices] = useState<Record<number, number>>({});
   const [loadingIds, setLoadingIds] = useState<number[]>([]);
+  const [loadingAll, setLoadingAll] = useState<boolean>(true);
 
+  // ✅ Fetch all base prices when page loads
+  useEffect(() => {
+    const fetchBasePrices = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const response = await fetch(`${API_BASE}/AdminPrivileges/get-all-base-prices`, {
+          headers: {
+            accept: "/",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          const newPrices: Record<number, number> = {};
+          data.forEach((item) => {
+            newPrices[item.professionId] = item.basePrice;
+          });
+          setPrices(newPrices);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (err: any) {
+        MySwal.fire({
+          icon: "error",
+          title: "Error",
+          text: err.message || "Failed to fetch base prices.",
+        });
+      } finally {
+        setLoadingAll(false);
+      }
+    };
+
+    fetchBasePrices();
+  }, []);
+
+  // ✅ Handle input change
   const handleChange = (id: number, value: string) => {
     setPrices((prev) => ({ ...prev, [id]: Number(value) }));
   };
 
+  // ✅ Save single base price
   const handleSave = async (professionId: number) => {
     const basePrice = prices[professionId] || 0;
     setLoadingIds((prev) => [...prev, professionId]);
@@ -63,6 +103,14 @@ const BasePrice: React.FC = () => {
       setLoadingIds((prev) => prev.filter((id) => id !== professionId));
     }
   };
+
+  if (loadingAll) {
+    return (
+      <div className="flex justify-center items-center min-h-screen text-gray-600 text-lg">
+        Loading base prices...
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
