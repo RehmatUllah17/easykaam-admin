@@ -24,41 +24,92 @@ const Complaints: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Fetch complaints
-  useEffect(() => {
-    const fetchComplaints = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("accessToken");
-        const response = await fetch(
-          `${API_BASE}/job-complaints/get-all?PageNumber=${pageNumber}&PageSize=${pageSize}`,
-          {
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (data?.data && Array.isArray(data.data)) {
-          setComplaints(data.data);
-        } else {
-          throw new Error("Invalid response format");
+  const fetchComplaints = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(
+        `${API_BASE}/job-complaints/get-all?PageNumber=${pageNumber}&PageSize=${pageSize}`,
+        {
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-      } catch (err: any) {
-        MySwal.fire({
-          icon: "error",
-          title: "Error",
-          text: err.message || "Failed to fetch complaints.",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+      );
 
+      const data = await response.json();
+
+      if (data?.data && Array.isArray(data.data)) {
+        setComplaints(data.data);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (err: any) {
+      MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Failed to fetch complaints.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchComplaints();
   }, [pageNumber, pageSize]);
+
+  // Approve complaint
+  const handleApprove = async (complaintId: string) => {
+    const { value: adminRemarks } = await MySwal.fire({
+      title: "Approve Complaint?",
+      input: "textarea",
+      inputLabel: "Admin Remarks (optional)",
+      inputPlaceholder: "Write remarks here...",
+      showCancelButton: true,
+      confirmButtonText: "Approve",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#16a34a",
+    });
+
+    if (adminRemarks === undefined) return; // cancelled
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(`${API_BASE}/job-complaints/approve`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          complaintId,
+          approve: true,
+          adminRemarks,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data?.isSuccess) {
+        MySwal.fire({
+          icon: "success",
+          title: "Approved",
+          text: data.message || "Complaint approved successfully.",
+        });
+        fetchComplaints(); // Refresh the table
+      } else {
+        throw new Error(data?.message || "Approval failed.");
+      }
+    } catch (err: any) {
+      MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message || "Something went wrong.",
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -90,6 +141,7 @@ const Complaints: React.FC = () => {
                 <th className="py-3 px-4">Attachment</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Complaint Date</th>
+                <th className="py-3 px-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -134,6 +186,16 @@ const Complaints: React.FC = () => {
                   </td>
                   <td className="py-3 px-4">
                     {new Date(c.complaintDate).toLocaleString()}
+                  </td>
+                  <td className="py-3 px-4 text-center">
+                    {c.complaintStatus === "Pending" && (
+                      <button
+                        onClick={() => handleApprove(c.complaintId)}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm"
+                      >
+                        Approve
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
