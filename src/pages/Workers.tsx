@@ -280,16 +280,14 @@ const Workers = () => {
             let label = "";
             let data: any[] = [];
 
-            if (key === 2) {
-              label = "Sent";
-              data = workersByStatus[2].data;
-            } else if (key === 3) {
-              label = "Verified";
-              data = workersByStatus[3].data;
-            } else {
-              label = "Suspended + Rejected";
-              data = combinedData;
-            }
+         if (key === 2 || key === 3) {
+  label = STATUS_MAP[key as number];
+  data = workersByStatus[key as number].data;
+} else {
+  label = "Suspended + Rejected";
+  data = combinedData;
+}
+
 
             const page =
               key === "combined"
@@ -303,6 +301,11 @@ const Workers = () => {
               startIndex,
               startIndex + cardsPerPage
             );
+{totalLocalPages > 1 && (
+  <div className="flex justify-center items-center gap-2 mt-4 text-sm text-gray-600">
+    Page {page} of {totalLocalPages}
+  </div>
+)}
 
             return (
               <div
