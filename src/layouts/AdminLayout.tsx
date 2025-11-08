@@ -65,6 +65,30 @@ const AdminLayout = () => {
   <span className="font-medium">Base Price</span>
 </Link>
 
+   <Link
+  to="/complaints"
+  className="group px-4 py-3 rounded-2xl hover:bg-red-50 transition-all duration-300 border border-transparent hover:border-red-100 flex items-center gap-3 text-gray-700 hover:text-red-600"
+>
+  <div className="w-8 h-8 rounded-lg bg-red-100 group-hover:bg-red-200 transition-colors flex items-center justify-center">
+    <svg
+      className="w-4 h-4 text-red-600"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      />
+    </svg>
+  </div>
+  <span className="font-medium">Complaints</span>
+</Link>
+
+
+
           
           <Link
             to="/settings"

@@ -45,11 +45,8 @@ export const normalizeApiWorker = (w: any, fallbackStatus?: number) => {
     w.mobileNumber ??
     "";
 
-  const imageURL =
-    w.profileImageUrl ?? w.profileImage ?? w.imageURL ?? null;
-
+  const imageURL = w.profileImageUrl ?? w.profileImage ?? w.imageURL ?? null;
   const idCardURL = w.idCardURL ?? w.idCardUrl ?? w.idCard ?? null;
-
   const policeClearanceURL =
     w.policeClearanceURL ?? w.policeClearance ?? null;
 
@@ -89,19 +86,15 @@ const Workers = () => {
       const res: WorkerResponse = await fetchWorkers(page, pageSize, statusKey);
 
       let arr: any[] = [];
-      if (Array.isArray(res?.data)) {
-        arr = res.data;
-      } else if (Array.isArray((res as any)?.items)) {
-        arr = (res as any).items;
-      } else if (Array.isArray(res as any)) {
-        arr = res as unknown as any[];
-      }
+      if (Array.isArray(res?.data)) arr = res.data;
+      else if (Array.isArray((res as any)?.items)) arr = (res as any).items;
+      else if (Array.isArray(res as any)) arr = res as unknown as any[];
 
       setWorkersByStatus((prev) => ({
         ...prev,
         [statusKey]: {
           data: arr.map((w) => normalizeApiWorker(w, statusKey)),
-          page: 1, // local pagination starts at 1
+          page,
           totalPages: res.totalPages ?? 1,
         },
       }));
@@ -111,9 +104,7 @@ const Workers = () => {
   };
 
   useEffect(() => {
-    Object.keys(STATUS_MAP).forEach((key) =>
-      loadWorkers(Number(key), 1)
-    );
+    [1, 2, 3, 4].forEach((key) => loadWorkers(key, 1));
   }, []);
 
   const getStatusColor = (statusKey: number) => {
@@ -192,9 +183,14 @@ const Workers = () => {
     return icons[statusKey as keyof typeof icons];
   };
 
+  const combinedData = [
+    ...workersByStatus[1].data.map((w) => ({ ...w, combined: true })),
+    ...workersByStatus[4].data.map((w) => ({ ...w, combined: true })),
+  ];
+
   return (
     <div className="p-8 space-y-8">
-      {/* Header Section */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -204,8 +200,6 @@ const Workers = () => {
             Manage and monitor worker verification status
           </p>
         </div>
-
-        {/* Stats Overview */}
         <div className="flex items-center gap-4">
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 py-3 border border-gray-200/60 shadow-sm">
             <div className="flex items-center gap-3">
@@ -227,7 +221,7 @@ const Workers = () => {
               <div>
                 <p className="text-2xl font-bold text-gray-900">
                   {Object.values(workersByStatus).reduce(
-                    (total, status) => total + status.data.length,
+                    (total, s) => total + s.data.length,
                     0
                   )}
                 </p>
@@ -240,167 +234,144 @@ const Workers = () => {
         </div>
       </div>
 
-      {/* Search Component */}
+      {/* Search Section */}
       <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/60 shadow-sm">
         <WorkerSearch
           onResults={setSearchResults}
           normalizeApiWorker={normalizeApiWorker}
         />
-      </div>
-
-      {/* Status Columns Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-        {Object.entries(STATUS_MAP).map(([statusKey, label]) => {
-          const key = Number(statusKey);
-          const { data, page } = workersByStatus[key] || {
-            data: [],
-            page: 1,
-          };
-
-          const filteredData = searchResults
-            ? searchResults.filter((w) => Number(w.statusId) === key)
-            : data;
-
-          const cardsPerPage = 4;
-          const totalLocalPages = Math.ceil(filteredData.length / cardsPerPage);
-          const startIndex = (page - 1) * cardsPerPage;
-          const currentCards = filteredData.slice(
-            startIndex,
-            startIndex + cardsPerPage
-          );
-
-          return (
-            <div
-              key={key}
-              className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-xl overflow-hidden flex flex-col h-fit"
+        {searchResults && (
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={() => setSearchResults(null)}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
             >
-              {/* Column Header */}
-              <div
-                className={`bg-gradient-to-r ${getStatusColor(
-                  key
-                )} p-6 text-white`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      {getStatusIcon(key)}
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-bold">{label}</h2>
-                      <p className="text-white/80 text-sm font-medium">
-                        {filteredData.length} workers
-                      </p>
-                    </div>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-sm font-bold">
-                    {filteredData.length}
-                  </div>
-                </div>
-              </div>
-
-              {/* Workers List */}
-              <div className="flex-1 p-4 space-y-3 min-h-[400px] max-h-[600px] overflow-y-auto">
-                {currentCards.length > 0 ? (
-                  currentCards.map((worker) => (
-                    <div
-                      key={worker.id}
-                      className="transform hover:scale-[1.02] transition-transform duration-200"
-                    >
-                      <WorkerCard worker={worker} />
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex flex-col items-center justify-center h-32 text-gray-400">
-                    <svg
-                      className="w-12 h-12 mb-2 opacity-50"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    <p className="text-sm font-medium">No workers found</p>
-                  </div>
-                )}
-              </div>
-
-              {/* Local Pagination */}
-              {totalLocalPages > 1 && (
-                <div className="p-4 border-t border-gray-200/60 bg-gray-50/50">
-                  <div className="flex items-center justify-between">
-                    <button
-                      onClick={() =>
-                        setWorkersByStatus((prev) => ({
-                          ...prev,
-                          [key]: {
-                            ...prev[key],
-                            page: Math.max(1, prev[key].page - 1),
-                          },
-                        }))
-                      }
-                      disabled={page === 1}
-                      className="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-30 text-sm flex items-center gap-2 shadow-sm"
-                    >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 19l-7-7 7-7"
-                        />
-                      </svg>
-                      Prev
-                    </button>
-
-                    <span className="text-sm font-medium text-gray-600 px-3 py-1 bg-white rounded-lg border border-gray-200 shadow-sm">
-                      {page} / {totalLocalPages}
-                    </span>
-
-                    <button
-                      onClick={() =>
-                        setWorkersByStatus((prev) => ({
-                          ...prev,
-                          [key]: {
-                            ...prev[key],
-                            page: Math.min(totalLocalPages, prev[key].page + 1),
-                          },
-                        }))
-                      }
-                      disabled={page >= totalLocalPages}
-                      className="px-4 py-2 rounded-xl bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-30 text-sm flex items-center gap-2 shadow-sm"
-                    >
-                      Next
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+              ← Back to All Workers
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Search Results */}
+      {searchResults ? (
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-lg p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Search Results</h2>
+          {searchResults.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {searchResults.map((worker) => (
+                <div
+                  key={worker.id}
+                  className="transform hover:scale-[1.02] transition-transform duration-200"
+                >
+                  <WorkerCard worker={worker} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8 font-medium">
+              No workers found.
+            </p>
+          )}
+        </div>
+      ) : (
+        /* Default 3-column grid */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {[2, 3, "combined"].map((key) => {
+            let label = "";
+            let data: any[] = [];
+
+            if (key === 2) {
+              label = "Sent";
+              data = workersByStatus[2].data;
+            } else if (key === 3) {
+              label = "Verified";
+              data = workersByStatus[3].data;
+            } else {
+              label = "Suspended + Rejected";
+              data = combinedData;
+            }
+
+            const page =
+              key === "combined"
+                ? 1
+                : workersByStatus[key as number]?.page || 1;
+
+            const cardsPerPage = 4;
+            const totalLocalPages = Math.ceil(data.length / cardsPerPage);
+            const startIndex = (page - 1) * cardsPerPage;
+            const currentCards = data.slice(
+              startIndex,
+              startIndex + cardsPerPage
+            );
+
+            return (
+              <div
+                key={key.toString()}
+                className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200/60 shadow-xl overflow-hidden flex flex-col h-fit"
+              >
+                <div
+                  className={`bg-gradient-to-r ${
+                    key === 2
+                      ? getStatusColor(2)
+                      : key === 3
+                      ? getStatusColor(3)
+                      : "from-orange-500 to-red-500 border-red-200"
+                  } p-6 text-white`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
+                        {key === "combined"
+                          ? getStatusIcon(4)
+                          : getStatusIcon(key as number)}
+                      </div>
+                      <div>
+                        <h2 className="text-lg font-bold">{label}</h2>
+                        <p className="text-white/80 text-sm font-medium">
+                          {data.length} workers
+                        </p>
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+                      {data.length}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex-1 p-4 space-y-3 min-h-[400px] max-h-[600px] overflow-y-auto">
+                  {currentCards.length > 0 ? (
+                    currentCards.map((worker) => (
+                      <div
+                        key={worker.id}
+                        className="transform hover:scale-[1.02] transition-transform duration-200"
+                      >
+                        <WorkerCard worker={worker} />
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center h-32 text-gray-400">
+                      <svg
+                        className="w-12 h-12 mb-2 opacity-50"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1}
+                          d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      <p className="text-sm font-medium">No workers found</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

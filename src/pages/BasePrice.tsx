@@ -20,7 +20,7 @@ const BasePrice: React.FC = () => {
   const [loadingIds, setLoadingIds] = useState<number[]>([]);
   const [loadingAll, setLoadingAll] = useState<boolean>(true);
 
-  // ✅ Fetch all base prices when page loads
+  //Fetch all base prices when page loads
   useEffect(() => {
     const fetchBasePrices = async () => {
       try {
@@ -57,12 +57,12 @@ const BasePrice: React.FC = () => {
     fetchBasePrices();
   }, []);
 
-  // ✅ Handle input change
+  // Handle input change
   const handleChange = (id: number, value: string) => {
     setPrices((prev) => ({ ...prev, [id]: Number(value) }));
   };
 
-  // ✅ Save single base price
+  // Save single base price
   const handleSave = async (professionId: number) => {
     const basePrice = prices[professionId] || 0;
     setLoadingIds((prev) => [...prev, professionId]);

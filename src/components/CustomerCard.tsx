@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { suspendCustomer } from "../api/customers";
+import { useNavigate } from "react-router-dom";
 
 interface Customer {
   id: string;
@@ -12,6 +13,7 @@ interface Customer {
 
 const CustomerCard: React.FC<{ customer: Customer }> = ({ customer }) => {
   const [localCustomer, setLocalCustomer] = useState<Customer>(customer);
+  const navigate = useNavigate();
 
   const isSuspended = !!localCustomer.suspendedUntilUtc;
 
@@ -29,10 +31,8 @@ const CustomerCard: React.FC<{ customer: Customer }> = ({ customer }) => {
       const reason = prompt("Enter reason for suspension:", "Violation of terms");
       if (!reason) return;
 
-      // call API
       await suspendCustomer(localCustomer.id, 0, suspendDays, reason);
 
-      // mark customer as suspended in UI
       const until = new Date();
       until.setDate(until.getDate() + suspendDays);
 
@@ -61,7 +61,7 @@ const CustomerCard: React.FC<{ customer: Customer }> = ({ customer }) => {
       />
       <div className="flex-1">
         <h2 className="text-lg font-semibold">{localCustomer.name}</h2>
-        <p className="text-sm text-gray-700">📞 {localCustomer.phoneNumber}</p>
+    
         <p className="text-xs text-gray-500">🆔 {localCustomer.id}</p>
 
         {isSuspended ? (
@@ -80,15 +80,22 @@ const CustomerCard: React.FC<{ customer: Customer }> = ({ customer }) => {
           <p className="mt-2 text-green-600 text-sm">✅ Active</p>
         )}
 
-        {/* Show suspend button only if active */}
-        {!isSuspended && (
+        <div className="flex gap-2 mt-3">
+          {!isSuspended && (
+            <button
+              onClick={handleSuspend}
+              className="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
+            >
+              Suspend
+            </button>
+          )}
           <button
-            onClick={handleSuspend}
-            className="mt-3 px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
+            onClick={() => navigate(`/customers/${localCustomer.id}`)}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           >
-            Suspend
+            View Profile
           </button>
-        )}
+        </div>
       </div>
     </div>
   );
