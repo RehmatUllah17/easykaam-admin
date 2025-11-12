@@ -281,12 +281,12 @@ const Workers = () => {
             let data: any[] = [];
 
          if (key === 2 || key === 3) {
-  label = STATUS_MAP[key as number];
-  data = workersByStatus[key as number].data;
-} else {
-  label = "Suspended + Rejected";
-  data = combinedData;
-}
+           label = STATUS_MAP[key as number];
+           data = workersByStatus[key as number].data;
+            } else {
+                  label = "Suspended + Rejected";
+                     data = combinedData;
+                    }
 
 
             const page =

@@ -8,6 +8,8 @@ import Customers from "./pages/Customers";
 import BasePrice from "./pages/BasePrice";
 import Complaints from "./pages/Complaints";
 import CustomerProfile from "./pages/CustomerProfile";
+import Support from "./pages/Customer Support/Support";  
+import Faqs from "./pages/Customer Support/faqs";
 import "./index.css";
 
 function App() {
@@ -32,7 +34,8 @@ function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="base-price" element={<BasePrice />} /> 
            <Route path="complaints" element={<Complaints />} />
-
+<Route path="support" element={<Support />} />
+<Route path="customer-support/faqs" element={<Faqs />} />
         </Route>
 
         <Route path="*" element={<p className="p-6">Page Not Found</p>} />

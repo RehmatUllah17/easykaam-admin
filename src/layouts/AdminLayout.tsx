@@ -87,6 +87,28 @@ const AdminLayout = () => {
   <span className="font-medium">Complaints</span>
 </Link>
 
+<Link
+  to="/support"
+  className="group px-4 py-3 rounded-2xl hover:bg-teal-50 transition-all duration-300 border border-transparent hover:border-teal-100 flex items-center gap-3 text-gray-700 hover:text-teal-600"
+>
+  <div className="w-8 h-8 rounded-lg bg-teal-100 group-hover:bg-teal-200 transition-colors flex items-center justify-center">
+    <svg
+      className="w-4 h-4 text-teal-600"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M18 10H6m0 0l6-6m-6 6l6 6"
+      />
+    </svg>
+  </div>
+  <span className="font-medium">Customer Support</span>
+</Link>
+
 
 
           
