@@ -1,7 +1,9 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const AdminLayout = () => {
   const navigate = useNavigate();
+const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -28,80 +30,103 @@ const AdminLayout = () => {
         {/* Navigation */}
         <nav className="flex flex-col gap-3 flex-1">
 
-         <Link
+       <Link
   to="/workers"
-  className="group px-4 py-3 rounded-2xl hover:bg-orange-50 transition-all duration-300 border border-transparent hover:border-orange-100 flex items-center gap-3 text-gray-700 hover:text-orange-600"
+  className={`group px-4 py-3 rounded-2xl flex items-center gap-3 transition-all duration-300
+    ${location.pathname === "/workers"
+      ? "bg-orange-50 border-orange-100 text-orange-600"
+      : "text-gray-700 hover:bg-orange-50 hover:border-orange-100 hover:text-orange-600"}
+  `}
 >
-  <div className="w-8 h-8 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors flex items-center justify-center">
-   <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-</svg>
+  <div
+    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+      ${location.pathname === "/workers"
+        ? "bg-orange-200"
+        : "bg-orange-100 group-hover:bg-orange-200"}
+    `}
+  >
+    <svg className="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+    </svg>
   </div>
   <span className="font-medium">Workers</span>
 </Link>
-         <Link
-  to="/Customers"
-  className="group px-4 py-3 rounded-2xl hover:bg-blue-50 transition-all duration-300 border border-transparent hover:border-blue-100 flex items-center gap-3 text-gray-700 hover:text-blue-600"
+
+      <Link
+  to="/customers"
+  className={`group px-4 py-3 rounded-2xl flex items-center gap-3 border transition-all duration-300
+    ${location.pathname === "/customers"
+      ? "bg-blue-50 border-blue-100 text-blue-600"
+      : "text-gray-700 hover:bg-blue-50 hover:border-blue-100 hover:text-blue-600 border-transparent"}
+  `}
 >
-  <div className="w-8 h-8 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors flex items-center justify-center">
+  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+    ${location.pathname === "/customers" ? "bg-blue-200" : "bg-blue-100 group-hover:bg-blue-200"}`}
+  >
     <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+      />
     </svg>
   </div>
   <span className="font-medium">Customers</span>
 </Link>
- <Link
+
+
+<Link
   to="/base-price"
-  className="group px-4 py-3 rounded-2xl hover:bg-emerald-50 transition-all duration-300 border border-transparent hover:border-emerald-100 flex items-center gap-3 text-gray-700 hover:text-emerald-600"
+  className={`group px-4 py-3 rounded-2xl flex items-center gap-3 border transition-all duration-300
+    ${location.pathname === "/base-price"
+      ? "bg-emerald-50 border-emerald-100 text-emerald-600"
+      : "text-gray-700 hover:bg-emerald-50 hover:border-emerald-100 hover:text-emerald-600 border-transparent"}
+  `}
 >
-  <div className="w-8 h-8 rounded-lg bg-emerald-100 group-hover:bg-emerald-200 transition-colors flex items-center justify-center">
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-    d="M3 3v18h18M7 13v5M11 9v9M15 11v7M19 7v11M9 5h6M12 5v4" />
-</svg>
-
-
+  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+    ${location.pathname === "/base-price" ? "bg-emerald-200" : "bg-emerald-100 group-hover:bg-emerald-200"}`}
+  >
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+        d="M3 3v18h18M7 13v5M11 9v9M15 11v7M19 7v11M9 5h6M12 5v4" />
+    </svg>
   </div>
   <span className="font-medium">Base Price</span>
 </Link>
 
+
    <Link
   to="/complaints"
-  className="group px-4 py-3 rounded-2xl hover:bg-red-50 transition-all duration-300 border border-transparent hover:border-red-100 flex items-center gap-3 text-gray-700 hover:text-red-600"
+  className={`group px-4 py-3 rounded-2xl flex items-center gap-3 border transition-all duration-300
+    ${location.pathname === "/complaints"
+      ? "bg-red-50 border-red-100 text-red-600"
+      : "text-gray-700 hover:bg-red-50 hover:border-red-100 hover:text-red-600 border-transparent"}
+  `}
 >
-  <div className="w-8 h-8 rounded-lg bg-red-100 group-hover:bg-red-200 transition-colors flex items-center justify-center">
-    <svg
-      className="w-4 h-4 text-red-600"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
+  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+    ${location.pathname === "/complaints" ? "bg-red-200" : "bg-red-100 group-hover:bg-red-200"}`}
+  >
+    <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
         d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     </svg>
   </div>
-  <span className="font-medium">Complaints</span>
+  <span className="font-medium">Rework Requests</span>
 </Link>
+
 
 <Link
   to="/support"
-  className="group px-4 py-3 rounded-2xl hover:bg-teal-50 transition-all duration-300 border border-transparent hover:border-teal-100 flex items-center gap-3 text-gray-700 hover:text-teal-600"
+  className={`group px-4 py-3 rounded-2xl flex items-center gap-3 border transition-all duration-300
+    ${location.pathname === "/support"
+      ? "bg-teal-50 border-teal-100 text-teal-600"
+      : "text-gray-700 hover:bg-teal-50 hover:border-teal-100 hover:text-teal-600 border-transparent"}
+  `}
 >
-  <div className="w-8 h-8 rounded-lg bg-teal-100 group-hover:bg-teal-200 transition-colors flex items-center justify-center">
-    <svg
-      className="w-4 h-4 text-teal-600"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
+  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+    ${location.pathname === "/support" ? "bg-teal-200" : "bg-teal-100 group-hover:bg-teal-200"}`}
+  >
+    <svg className="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
         d="M18 10H6m0 0l6-6m-6 6l6 6"
       />
     </svg>
@@ -111,19 +136,31 @@ const AdminLayout = () => {
 
 
 
+
           
-          <Link
-            to="/settings"
-            className="group px-4 py-3 rounded-2xl hover:bg-purple-50 transition-all duration-300 border border-transparent hover:border-purple-100 flex items-center gap-3 text-gray-700 hover:text-purple-600"
-          >
-            <div className="w-8 h-8 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors flex items-center justify-center">
-              <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <span className="font-medium">Settings</span>
-          </Link>
+         <Link
+  to="/settings"
+  className={`group px-4 py-3 rounded-2xl flex items-center gap-3 border transition-all duration-300
+    ${location.pathname === "/settings"
+      ? "bg-purple-50 border-purple-100 text-purple-600"
+      : "text-gray-700 hover:bg-purple-50 hover:border-purple-100 hover:text-purple-600 border-transparent"}
+  `}
+>
+  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+    ${location.pathname === "/settings" ? "bg-purple-200" : "bg-purple-100 group-hover:bg-purple-200"}`}
+  >
+    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+      />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    </svg>
+  </div>
+  <span className="font-medium">Settings</span>
+</Link>
+
         </nav>
 
         {/* User Profile Section */}

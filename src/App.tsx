@@ -10,6 +10,7 @@ import Complaints from "./pages/Complaints";
 import CustomerProfile from "./pages/CustomerProfile";
 import Support from "./pages/Customer Support/Support";  
 import Faqs from "./pages/Customer Support/faqs";
+import TicketComplaints from "./pages/Customer Support/ticket-complaints";
 import "./index.css";
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
            <Route path="complaints" element={<Complaints />} />
 <Route path="support" element={<Support />} />
 <Route path="customer-support/faqs" element={<Faqs />} />
+<Route path="customer-support/ticket-complaints" element={<TicketComplaints />} />
         </Route>
 
         <Route path="*" element={<p className="p-6">Page Not Found</p>} />

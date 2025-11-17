@@ -10,9 +10,9 @@ const Support = () => {
       path: "/customer-support/faqs",
     },
     {
-      title: "Rework Requests",
-      description: "Submit a rework or follow up on your previous requests.",
-      path: "/customer-support/rework",
+      title: "Ticket Complaints",
+      description: "Submit a complaint or track your ticket status.",
+      path: "/customer-support/ticket-complaints",
     },
   ];
 
