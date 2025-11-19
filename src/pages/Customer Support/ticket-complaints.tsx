@@ -38,25 +38,24 @@ const TicketComplaints: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [categoryId, setCategoryId] = useState(1);
-  const [statusId, setStatusId] = useState(1);
-
+  const [categoryId, setCategoryId] = useState<number | "">("");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
-  const fetchTickets = async (opts?: { category?: number; status?: number; page?: number }) => {
+  const fetchTickets = async (page = 1, category?: number | "") => {
     setLoading(true);
 
     try {
       const token = localStorage.getItem("accessToken");
       if (!token) throw new Error("No access token found");
 
-      const qCategory = opts?.category ?? categoryId;
-      const qStatus = opts?.status ?? statusId;
-      const qPage = opts?.page ?? pageNumber;
+      // Always StatusId = 1 (Open)
+      let url = `${API_BASE}/customer-support/get-all-tickets?StatusId=1&PageNumber=${page}&PageSize=10`;
 
-      const url = `${API_BASE}/customer-support/get-all-tickets?StatusId=${qStatus}&SupportCategory=${qCategory}&PageNumber=${qPage}&PageSize=10`;
+      if (category !== "" && category !== undefined) {
+        url += `&SupportCategory=${category}`;
+      }
 
       const res = await fetch(url, {
         headers: {
@@ -80,18 +79,12 @@ const TicketComplaints: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchTickets();
-  }, []);
-
-  useEffect(() => {
-    setPageNumber(1);
-    fetchTickets({ category: categoryId, status: statusId, page: 1 });
-  }, [categoryId, statusId]);
+    fetchTickets(1, categoryId);
+  }, [categoryId]);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
-    setPageNumber(newPage);
-    fetchTickets({ category: categoryId, status: statusId, page: newPage });
+    fetchTickets(newPage, categoryId);
   };
 
  const handleViewDetails = (ticket: any) => {
@@ -99,14 +92,47 @@ const TicketComplaints: React.FC = () => {
 
   MySwal.fire({
     title: "Ticket Details",
+    width: 600,
     html: `
-      <div class="text-left space-y-2">
+      <div class="text-left space-y-3">
+
         <p><strong>Subject:</strong> ${ticket.subject ?? "-"}</p>
         <p><strong>Email:</strong> ${ticket.email ?? "-"}</p>
+        <p><strong>Phone:</strong> ${ticket.phone ?? "-"}</p>
+
         <p><strong>Category:</strong> ${ComplaintTypeMap[ticket.categoryId]}</p>
         <p><strong>Status:</strong> ${SupportStatusMap[ticket.statusId]}</p>
+
+        <p><strong>Description:</strong><br> 
+          <span class="text-gray-700">${ticket.description ?? "-"}</span>
+        </p>
+
+        <p><strong>Related Job ID:</strong> ${ticket.jobId ?? "-"}</p>
+        <p><strong>Order ID:</strong> ${ticket.orderId ?? "-"}</p>
+
         <p><strong>Created:</strong> ${created}</p>
         <p><strong>Ticket ID:</strong> ${ticket.id}</p>
+
+        ${
+          ticket.attachments && ticket.attachments.length > 0
+            ? `
+              <div>
+                <strong>Attachments:</strong>
+                <div class="mt-2 flex flex-wrap gap-3">
+                  ${ticket.attachments
+                    .map(
+                      (url: string) => `
+                      <a href="${url}" target="_blank">
+                        <img src="${url}" class="w-20 h-20 rounded-lg border object-cover" />
+                      </a>
+                    `
+                    )
+                    .join("")}
+                </div>
+              </div>
+            `
+            : "<p><strong>Attachments:</strong> None</p>"
+        }
       </div>
     `,
     confirmButtonText: "Close",
@@ -117,43 +143,28 @@ const TicketComplaints: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-12">
       <div className="max-w-5xl mx-auto">
-        {/* Filters */}
+
+        {/* FILTERS */}
         <div className="bg-white rounded-2xl shadow p-6 border border-gray-200 mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Ticket Complaints</h1>
-          <p className="text-gray-600 mt-1">View and track your customer support tickets.</p>
+          <p className="text-gray-600 mt-1">View and track support complaints.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            {/* Category */}
-            <div>
-              <label className="text-sm text-gray-500 block mb-1">Filter by Category</label>
-              <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(parseInt(e.target.value))}
-                className="w-full rounded-lg border-gray-200 px-3 py-2"
-              >
-                {Object.entries(ComplaintTypeMap).map(([key, val]) => (
-                  <option key={key} value={key}>
-                    {val}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Status */}
-            <div>
-              <label className="text-sm text-gray-500 block mb-1">Filter by Status</label>
-              <select
-                value={statusId}
-                onChange={(e) => setStatusId(parseInt(e.target.value))}
-                className="w-full rounded-lg border-gray-200 px-3 py-2"
-              >
-                {Object.entries(SupportStatusMap).map(([key, val]) => (
-                  <option key={key} value={key}>
-                    {val}
-                  </option>
-                ))}
-              </select>
-            </div>
+          <div className="mt-6">
+            <label className="text-sm text-gray-500 block mb-1">Filter by Category</label>
+            <select
+              value={categoryId}
+              onChange={(e) =>
+                setCategoryId(e.target.value === "" ? "" : parseInt(e.target.value))
+              }
+              className="w-full rounded-lg border-gray-200 px-3 py-2"
+            >
+              <option value="">All Categories</option>
+              {Object.entries(ComplaintTypeMap).map(([key, val]) => (
+                <option key={key} value={key}>
+                  {val}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -198,7 +209,7 @@ const TicketComplaints: React.FC = () => {
                 </tbody>
               </table>
 
-              {/* Pagination */}
+              {/* PAGINATION */}
               <div className="flex items-center justify-between mt-4">
                 <div className="text-sm text-gray-600">
                   Page <strong>{pageNumber}</strong> of <strong>{totalPages}</strong>
@@ -222,6 +233,7 @@ const TicketComplaints: React.FC = () => {
                   </button>
                 </div>
               </div>
+
             </div>
           )}
         </div>
