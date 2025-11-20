@@ -10,6 +10,13 @@ type Ticket = {
   statusId: number;
   categoryId: number;
   createdAt: string;
+  subject?: string;
+  email?: string;
+  phone?: string;
+  description?: string;
+  jobId?: string;
+  orderId?: string;
+  attachments?: string[];
 };
 
 type TicketsResponse = {
@@ -20,11 +27,13 @@ type TicketsResponse = {
   totalPages: number;
 };
 
-const ComplaintTypeMap: Record<number, string> = {
-  0: "Job Complaint",
-  1: "Payment Complaint",
-  2: "Customer Complaint",
-  3: "Worker Complaint",
+const SupportCategoryMap: Record<number, string> = {
+  1: "Payment",
+  2: "Booking",
+  3: "App Issue",
+  4: "Account",
+  5: "Refund",
+  99: "Other",
 };
 
 const SupportStatusMap: Record<number, string> = {
@@ -50,7 +59,6 @@ const TicketComplaints: React.FC = () => {
       const token = localStorage.getItem("accessToken");
       if (!token) throw new Error("No access token found");
 
-      // Always StatusId = 1 (Open)
       let url = `${API_BASE}/customer-support/get-all-tickets?StatusId=1&PageNumber=${page}&PageSize=10`;
 
       if (category !== "" && category !== undefined) {
@@ -67,6 +75,7 @@ const TicketComplaints: React.FC = () => {
       if (!res.ok) throw new Error("Failed to fetch tickets");
 
       const data: TicketsResponse = await res.json();
+
       setTickets(data.data || []);
       setPageNumber(data.pageNumber);
       setPageSize(data.pageSize);
@@ -87,58 +96,56 @@ const TicketComplaints: React.FC = () => {
     fetchTickets(newPage, categoryId);
   };
 
- const handleViewDetails = (ticket: any) => {
-  const created = new Date(ticket.createdAt).toLocaleString();
+  const handleViewDetails = (ticket: Ticket) => {
+    const created = new Date(ticket.createdAt).toLocaleString();
 
-  MySwal.fire({
-    title: "Ticket Details",
-    width: 600,
-    html: `
-      <div class="text-left space-y-3">
+    MySwal.fire({
+      title: "Ticket Details",
+      width: 600,
+      html: `
+        <div class="text-left space-y-3">
+          <p><strong>Subject:</strong> ${ticket.subject ?? "-"}</p>
+          <p><strong>Email:</strong> ${ticket.email ?? "-"}</p>
+          <p><strong>Phone:</strong> ${ticket.phone ?? "-"}</p>
 
-        <p><strong>Subject:</strong> ${ticket.subject ?? "-"}</p>
-        <p><strong>Email:</strong> ${ticket.email ?? "-"}</p>
-        <p><strong>Phone:</strong> ${ticket.phone ?? "-"}</p>
+          <p><strong>Category:</strong> ${SupportCategoryMap[ticket.categoryId]}</p>
+          <p><strong>Status:</strong> ${SupportStatusMap[ticket.statusId]}</p>
 
-        <p><strong>Category:</strong> ${ComplaintTypeMap[ticket.categoryId]}</p>
-        <p><strong>Status:</strong> ${SupportStatusMap[ticket.statusId]}</p>
+          <p><strong>Description:</strong><br>
+            <span class="text-gray-700">${ticket.description ?? "-"}</span>
+          </p>
 
-        <p><strong>Description:</strong><br> 
-          <span class="text-gray-700">${ticket.description ?? "-"}</span>
-        </p>
+          <p><strong>Related Job ID:</strong> ${ticket.jobId ?? "-"}</p>
+          <p><strong>Order ID:</strong> ${ticket.orderId ?? "-"}</p>
 
-        <p><strong>Related Job ID:</strong> ${ticket.jobId ?? "-"}</p>
-        <p><strong>Order ID:</strong> ${ticket.orderId ?? "-"}</p>
+          <p><strong>Created:</strong> ${created}</p>
+          <p><strong>Ticket ID:</strong> ${ticket.id}</p>
 
-        <p><strong>Created:</strong> ${created}</p>
-        <p><strong>Ticket ID:</strong> ${ticket.id}</p>
-
-        ${
-          ticket.attachments && ticket.attachments.length > 0
-            ? `
+          ${
+            ticket.attachments && ticket.attachments.length
+              ? `
               <div>
                 <strong>Attachments:</strong>
                 <div class="mt-2 flex flex-wrap gap-3">
                   ${ticket.attachments
                     .map(
-                      (url: string) => `
-                      <a href="${url}" target="_blank">
-                        <img src="${url}" class="w-20 h-20 rounded-lg border object-cover" />
-                      </a>
-                    `
+                      (url) => `
+                    <a href="${url}" target="_blank">
+                      <img src="${url}" class="w-20 h-20 rounded-lg border object-cover" />
+                    </a>
+                  `
                     )
                     .join("")}
                 </div>
               </div>
             `
-            : "<p><strong>Attachments:</strong> None</p>"
-        }
-      </div>
-    `,
-    confirmButtonText: "Close",
-  });
-};
-
+              : "<p><strong>Attachments:</strong> None</p>"
+          }
+        </div>
+      `,
+      confirmButtonText: "Close",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-12">
@@ -159,7 +166,7 @@ const TicketComplaints: React.FC = () => {
               className="w-full rounded-lg border-gray-200 px-3 py-2"
             >
               <option value="">All Categories</option>
-              {Object.entries(ComplaintTypeMap).map(([key, val]) => (
+              {Object.entries(SupportCategoryMap).map(([key, val]) => (
                 <option key={key} value={key}>
                   {val}
                 </option>
@@ -191,7 +198,7 @@ const TicketComplaints: React.FC = () => {
                   {tickets.map((ticket, i) => (
                     <tr key={ticket.id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-4">{(pageNumber - 1) * pageSize + i + 1}</td>
-                      <td className="py-3 px-4">{ComplaintTypeMap[ticket.categoryId]}</td>
+                      <td className="py-3 px-4">{SupportCategoryMap[ticket.categoryId]}</td>
                       <td className="py-3 px-4">{SupportStatusMap[ticket.statusId]}</td>
                       <td className="py-3 px-4 text-sm text-gray-600">
                         {new Date(ticket.createdAt).toLocaleString()}
